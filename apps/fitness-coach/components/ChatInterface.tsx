@@ -34,13 +34,48 @@ export default function ChatInterface() {
     ]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [sessionId, setSessionId] = useState<string>("");
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // Initialize or retrieve Session ID
+        let existingId = localStorage.getItem("fitness_coach_session_id");
+        if (!existingId) {
+            existingId = `session_${Math.random().toString(36).substring(2, 11)}`;
+            localStorage.setItem("fitness_coach_session_id", existingId);
+        }
+        setSessionId(existingId);
+    }, []);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [messages]);
+
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                if (!sessionId) return;
+                const response = await fetch(`/api/history?sessionId=${sessionId}`);
+                const data = await response.json();
+                if (data.success && data.history && data.history.length > 0) {
+                    const mappedMessages: Message[] = data.history.map((item: any) => ({
+                        id: item.id.toString(),
+                        role: item.message.role,
+                        content: item.message.content,
+                        timestamp: new Date(item.created_at),
+                        metrics: item.message.metrics || null,
+                    }));
+                    setMessages(mappedMessages);
+                }
+            } catch (err) {
+                console.error("Failed to load history:", err);
+            }
+        };
+
+        fetchHistory();
+    }, []);
 
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;
@@ -62,7 +97,7 @@ export default function ChatInterface() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     message: input,
-                    sessionId: "fitness-coach-session-1",
+                    sessionId: sessionId,
                 }),
             });
 
