@@ -5,7 +5,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { message, sessionId } = body;
 
-        const response = await fetch('http://localhost:5678/webhook/fitness-coach', {
+        const response = await fetch('http://localhost:5678/webhook/fitness-coach-v2', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -22,12 +22,13 @@ export async function POST(request: Request) {
 
         const data = await response.json();
 
-        // Check if data is array or object based on n8n response node 
+        // The data now comes from our Metric Extractor node
         const result = Array.isArray(data) ? data[0] : data;
 
         return Response.json({
             success: true,
             output: result.output || result.text || result.message || JSON.stringify(result),
+            metrics: result.metrics || null,
         });
     } catch (error: any) {
         console.error('Chat API Error:', error);

@@ -15,6 +15,12 @@ interface Message {
     role: "user" | "bot";
     content: string;
     timestamp: Date;
+    metrics?: {
+        sets: string;
+        reps: string;
+        intensity: string;
+        hasWorkout: boolean;
+    };
 }
 
 export default function ChatInterface() {
@@ -68,6 +74,7 @@ export default function ChatInterface() {
                     role: "bot",
                     content: data.output,
                     timestamp: new Date(),
+                    metrics: data.metrics,
                 };
                 setMessages((prev) => [...prev, botMsg]);
             } else {
@@ -139,6 +146,37 @@ export default function ChatInterface() {
                                     </div>
                                 )}
                                 <div className="whitespace-pre-wrap">{msg.content}</div>
+
+                                {/* Neural Sync Card */}
+                                {msg.metrics?.hasWorkout && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="mt-4 p-3 bg-cyber-neon/10 border border-cyber-neon/30 rounded-lg overflow-hidden relative"
+                                    >
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-[10px] font-bold text-cyber-neon uppercase tracking-widest">
+                                                Neural Sync: Workout Detected
+                                            </span>
+                                            <Terminal className="w-3 h-3 text-cyber-neon/50" />
+                                        </div>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div className="bg-cyber-charcoal/50 p-2 rounded border border-cyber-neon/5">
+                                                <div className="text-[8px] text-cyber-muted uppercase">Sets</div>
+                                                <div className="text-sm font-bold text-cyber-neon">{msg.metrics.sets}</div>
+                                            </div>
+                                            <div className="bg-cyber-charcoal/50 p-2 rounded border border-cyber-neon/5">
+                                                <div className="text-[8px] text-cyber-muted uppercase">Reps</div>
+                                                <div className="text-sm font-bold text-cyber-neon">{msg.metrics.reps}</div>
+                                            </div>
+                                            <div className="bg-cyber-charcoal/50 p-2 rounded border border-cyber-neon/5">
+                                                <div className="text-[8px] text-cyber-muted uppercase">Level</div>
+                                                <div className="text-sm font-bold text-cyber-neon">{msg.metrics.intensity}</div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+
                                 <div className="mt-2 text-[9px] font-mono text-cyber-muted opacity-50 uppercase">
                                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
