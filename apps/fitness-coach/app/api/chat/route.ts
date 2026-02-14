@@ -5,7 +5,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { message, sessionId } = body;
 
-        const response = await fetch('http://localhost:5678/webhook-test/fitness-coach-v2', {
+        const response = await fetch('http://localhost:5678/webhook-test/fitness-coach-v3', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

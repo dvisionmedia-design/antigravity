@@ -75,7 +75,7 @@ export default function ChatInterface() {
         };
 
         fetchHistory();
-    }, []);
+    }, [sessionId]);
 
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;
